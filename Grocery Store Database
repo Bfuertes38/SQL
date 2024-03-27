@@ -8,7 +8,7 @@ INSERT INTO store VALUES (5, "Chicken", "meat", 4.99, 65);
 INSERT INTO store VALUES (6, "salsa", "fresh", 3.25, 43);
 INSERT INTO store VALUES (7, "hummus", "fresh", 2.99, 35);
 
---Display by Pricce
+--Display by Price
 SELECT * FROM store
 ORDER BY price desc; 
 

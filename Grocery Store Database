@@ -1,5 +1,3 @@
---Create a grocery store database
-
 CREATE TABLE store (id INTEGER PRIMARY KEY, item TEXT, section TEXT, price INTEGER, popularity INTEGER);
 
 INSERT INTO store VALUES (1, "papaya", "produce", 2.99, 50);

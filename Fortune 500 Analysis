@@ -1,7 +1,7 @@
 #This analysis utilized the following Fortune 500 dataset: Used from the Break into Tech course located here https://www.db-fiddle.com/f/saxdDCCyos6z6UdpjeEXSJ/0
 
 CREATE TABLE fortune_companies (
-    company_id INTEGER PRIMARY KEY,
+    company_id SERIAL PRIMARY KEY NOT NULL,
     company_name TEXT,
     industry TEXT,
     revenue REAL,
@@ -57,6 +57,7 @@ VALUES
     ('Company II', 'Telecommunications', 110.5, 2000, 1, 21, 12, 4.9),
     ('Company JJ', 'Manufacturing', 370.0, 3100, 1, 20, 12, 7.6),
     ('Company KK', 'Healthcare', 150.2, 3400, 0, 16, 8, 5.3);
+
 
 
 #Analysis:

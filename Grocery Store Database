@@ -1,3 +1,6 @@
+All tables and queries included in this database were developed by me. 
+I have uploaded this database primarily to showcase my proficiency in creating tables and implementing basic categorizations. 
+
 CREATE TABLE store (id INTEGER PRIMARY KEY, item TEXT, section TEXT, price INTEGER, popularity INTEGER);
 
 INSERT INTO store VALUES (1, "papaya", "produce", 2.99, 50);

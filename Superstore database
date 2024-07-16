@@ -1,3 +1,7 @@
+All tables and queries included in this database were developed by me. 
+I have uploaded this database primarily to showcase my proficiency in creating tables and implementing basic categorizations. 
+
+
 CREATE TABLE superstore (
     item_id INTEGER PRIMARY KEY,
     item_name TEXT,

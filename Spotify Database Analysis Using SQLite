@@ -1,0 +1,41 @@
+# For this project, I downloaded Spotify data from Kaggle and  created a table to insert the Spotify data into.
+# I then inserted the Spotify Data .csv into the table using SQLite Studio
+#Next, I explored the data using the following SQL.
+
+
+# First I arranged the track names in order of highest popularity
+SELECT popularity, track_name
+FROM Spotifydata
+ORDER BY popularity ASC;
+
+# Next I determined which of the most popular songs have a tempo of  over 100bpm AND have a danceability rating of over .5
+SELECT popularity, 
+track_name, 
+tempo,
+danceability FROM Spotifydata
+WHERE tempo > 100 AND danceability >.5
+ORDER BY popularity ASC ;
+
+#Then  I determined the avg popularity, danceability, and energy by artist and track.
+SELECT 
+artist_name
+,track_name
+,avg(popularity)
+,avg(danceability)
+,avg(energy)
+FROM BIT_DB.spotifydata
+GROUP BY artist_name, track_name;
+
+#I have recently acquired some skills that allow me to incorporate a CTE into my query, as listed below.
+WITH popularity_average_CTE AS (
+SELECT s.artist_name,
+AVG(s.popularity) AS average_popularity
+FROM SpotifyData s 
+GROUP BY s.artist_name
+)
+ 
+SELECT  artist_name,
+        average_popularity,
+        'Top Star' AS tag
+FROM popularity_average_CTE
+WHERE average_popularity>=90;

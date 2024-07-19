@@ -1,8 +1,16 @@
 #In this SQL, I'm querying a database with multiple tables in it to quantify statistics about customer and order data. 
+#The data was given in a ZIP file from the course Break Into Tech by Charlotte Chaze and imported into SQLite. It is a database of a company that sells 
+multiple products and the sales records.
+
+#From there I was able to view the data further. I started by cleaning the data that was empty or NULL using the code;
+WHERE length(order_id) = 6
+AND order_id <> 'Order ID'
+
+#I then began to explore the data as follows
 
 #1. How many orders were placed in January? 
 SELECT COUNT(orderid)
-FROM BIT_DB.JanSales
+FROM BIT_DB.JanSalesg
 WHERE length(orderid) = 6 
 AND orderid <> 'Order ID'
 

@@ -2,76 +2,113 @@
 #The data was given in a ZIP file from the course Break Into Tech by Charlotte Chaze and imported into SQLite. It is a database of a company that sells 
 multiple products and the sales records.
 
+After the database had been connected to SQLite Studio. I started by exploring the data too see if there are any fields that were empty or NULL using the query;
+SELECT * FROM "customers","JanSales"
 
-#I started by exploring the data  to see if there are any fields that were empty or NULL using the code;
-SELECT * FROM "customers","JanSales" LIMIT 200; 
+I chose to start with the customers and January sales table as this is the onthly targer I am looking to review in this analysis .
 
 
-#From there I was able to view the data further. 
-
+From here I located a few rows of "messy" data  in which the order ID has been listed as ". . ." Showing that  those rows contain more data than what's being displayed SQLite Studio.  I also located a few rows where the order is was not a number but listed as "Order_id"
+To fix this I created the query  below to filter out rows that have the word "Order ID" instead of a number, and rows that have order IDs that are so long that they show up as " . . . "
 WHERE length(order_id) = 6
 AND order_id <> 'Order ID'
 
-#I then began to explore the data as follows
+From there I was able to explore the data further for my analysis. Below are the questions presented and the subsequent queries to extract the data needed.
 
-#1. How many orders were placed in January? 
-SELECT COUNT(orderid)
-FROM BIT_DB.JanSalesg
-WHERE length(orderid) = 6 
+#1. How many orders were placed in January?
+SELECT COUNT (orderid)
+FROM "JanSales"
+WHERE length(orderid) = 6
 AND orderid <> 'Order ID'
 
-#2. How many of those orders were for an iPhone? 
+#2. How many of those orders were for an iPhone?
 SELECT COUNT(orderid)
-FROM BIT_DB.JanSales
+FROM "JanSales"
 WHERE Product='iPhone'
-AND length(orderid) = 6 
+AND length(orderid) = 6
 AND orderid <> 'Order ID'
 
-#3. Select the customer account numbers for all the orders that were placed in February. 
-SELECT distinct acctnum
-FROM BIT_DB.customers cust
+#3. Select the customer account numbers for all the orders that were placed in January.
+SELECT DISTINCT "acctnum"
+FROM "customers"
+INNER JOIN "JanSales" ON "customers"."order_id" = "JanSales"."orderID"
+WHERE LENGTH("customers"."order_id") = 6
+AND "customers"."order_id" <> 'Order ID';
 
-INNER JOIN BIT_DB.FebSales Feb
-ON cust.order_id=FEB.orderid
-WHERE length(orderid) = 6 
-AND orderid <> 'Order ID'
+#4. Which product was the cheapest one sold in January, and what was the price?
+SELECT DISTINCT Product, price
+FROM "JanSales"
+WHERE price = (SELECT MIN(price) FROM "JanSales")
+ORDER BY price ASC
+LIMIT 1;
 
-#4. Which product was the cheapest one sold in January, and what was the price? 
-SELECT distinct Product, price
-FROM BIT_DB.JanSales
-WHERE  price in (SELECT min(price) FROM BIT_DB.JanSales)
-#OR 
-SELECT distinct product, price FROM BIT_DB.JanSales 
-ORDER BY price ASC LIMIT 1
-
-#5. What is the total revenue for each product sold in January?
-SELECT sum(quantity)*price as revenue
-,product
-FROM BIT_DB.JanSales
-GROUP BY product
-
-#6. Which products were sold in January  at 548 Lincoln St, Seattle, WA 98101, how many of each were sold, and what was the total revenue?
-select 
-sum(Quantity), 
-product, 
-sum(quantity)*price as revenue
-FROM BIT_DB.JanSales 
+#6. Which products were sold overall  at 548 Lincoln St, Seattle, WA 98101, how many of each were sold, and what was the total revenue?
+SELECT
+Product,
+SUM(Quantity) AS total_quantity_sold,
+SUM(Quantity * price) AS total_revenue
+FROM (
+SELECT
+Product,
+Quantity,
+price,
+location
+FROM AprSales
 WHERE location = '548 Lincoln St, Seattle, WA 98101'
-GROUP BY product
+UNION ALL
 
-#7. How many customers ordered more than 2 products at a time, and what was the average amount spent for those customers? 
-select 
-count(distinct cust.acctnum), 
-avg(quantity*price)
-FROM BIT_DB.FebSales Feb
-LEFT JOIN BIT_DB.customers cust
-ON FEB.orderid=cust.order_id
-WHERE Feb.Quantity>2
-AND length(orderid) = 6 
-AND orderid <> 'Order ID'
+SELECT
+Product,
+Quantity,
+price,
+location
+FROM FebSales
+WHERE location = '548 Lincoln St, Seattle, WA 98101'
+UNION ALL
 
-#8. List all the products sold in Los Angeles in January, and include how many of each were sold.
+SELECT
+Product,
+Quantity,
+price,
+location
+FROM JanSales
+WHERE location = '548 Lincoln St, Seattle, WA 98101'
+UNION ALL
+
+SELECT
+Product,
+Quantity,
+price,
+location
+FROM MarSales
+WHERE location = '548 Lincoln St, Seattle, WA 98101'
+UNION ALL
+
+SELECT
+Product,
+Quantity,
+price,
+location
+FROM MaySales
+WHERE location = '548 Lincoln St, Seattle, WA 98101'
+) AS CombinedSales
+GROUP BY Product;
+
+#7. How many customers ordered more than 2 products at a time, and what was the average amount spent for those customers for the month of January?
+SELECT
+COUNT(DISTINCT cust.acctnum) AS distinct_customer_count,
+AVG(Jan.Quantity * Jan.price) AS average_revenue
+FROM
+"JanSales" Jan
+LEFT JOIN
+"customers" cust ON Jan.orderID = cust.order_id
+WHERE
+Jan.Quantity > 2
+AND LENGTH(Jan.orderid) = 6
+AND Jan.orderid <> 'Order ID';
+
+#8. List all the products sold in Los Angeles in January , and include how many of each were sold.
 SELECT Product, SUM(quantity)
-FROM BIT_DB.JanSales 
+FROM "JanSales"
 WHERE location LIKE '%Los Angeles%'
 GROUP BY Product

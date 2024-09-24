@@ -2,7 +2,13 @@
 #The data was given in a ZIP file from the course Break Into Tech by Charlotte Chaze and imported into SQLite. It is a database of a company that sells 
 multiple products and the sales records.
 
-#From there I was able to view the data further. I started by cleaning the data that was empty or NULL using the code;
+
+#I started by exploring the data  to see if there are any fields that were empty or NULL using the code;
+SELECT * FROM "customers","JanSales" LIMIT 200; 
+
+
+#From there I was able to view the data further. 
+
 WHERE length(order_id) = 6
 AND order_id <> 'Order ID'
 
@@ -44,12 +50,12 @@ SELECT sum(quantity)*price as revenue
 FROM BIT_DB.JanSales
 GROUP BY product
 
-#6. Which products were sold in February at 548 Lincoln St, Seattle, WA 98101, how many of each were sold, and what was the total revenue?
+#6. Which products were sold in January  at 548 Lincoln St, Seattle, WA 98101, how many of each were sold, and what was the total revenue?
 select 
 sum(Quantity), 
 product, 
 sum(quantity)*price as revenue
-FROM BIT_DB.FebSales 
+FROM BIT_DB.JanSales 
 WHERE location = '548 Lincoln St, Seattle, WA 98101'
 GROUP BY product
 
@@ -64,8 +70,8 @@ WHERE Feb.Quantity>2
 AND length(orderid) = 6 
 AND orderid <> 'Order ID'
 
-#8. List all the products sold in Los Angeles in February, and include how many of each were sold.
+#8. List all the products sold in Los Angeles in January, and include how many of each were sold.
 SELECT Product, SUM(quantity)
-FROM BIT_DB.FebSales 
+FROM BIT_DB.JanSales 
 WHERE location LIKE '%Los Angeles%'
 GROUP BY Product

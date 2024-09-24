@@ -5,7 +5,7 @@ multiple products and the sales records.
 After the database had been connected to SQLite Studio. I started by exploring the data too see if there are any fields that were empty or NULL using the query;
 SELECT * FROM "customers","JanSales"
 
-I chose to start with the customers and January sales table as this is the onthly targer I am looking to review in this analysis .
+I chose to start with the customers and January sales table as this is the monthly target I am looking to review in this analysis .
 
 
 From here I located a few rows of "messy" data  in which the order ID has been listed as ". . ." Showing that  those rows contain more data than what's being displayed SQLite Studio.  I also located a few rows where the order is was not a number but listed as "Order_id"

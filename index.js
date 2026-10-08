@@ -60,23 +60,12 @@ function getStoryDirectorGenerationTokens(kind) {
 
 async function generateDirectorResponse(prompt, maxTokens, retryOnEmpty = true) {
     const context = SillyTavern.getContext();
-    const connectionService =
-        context.ConnectionManagerRequestService;
-
-    const profileId =
-        context.extensionSettings?.connectionManager?.selectedProfile;
-
-    if (!profileId) {
-        throw new Error(
-            '[Story Director] No active connection profile found.'
-        );
-    }
+    const connectionService = context.ConnectionManagerRequestService;
+    const profileId = context.extensionSettings?.connectionManager?.selectedProfile;
+    const responseLength = Math.max(1, Number(maxTokens) || 800);
 
     const extractResponseText = (result) => {
-        if (typeof result === 'string' && result.trim()) {
-            return result.trim();
-        }
-
+        if (typeof result === 'string' && result.trim()) return result.trim();
         const candidates = [
             result?.content,
             result?.text,
@@ -88,89 +77,55 @@ async function generateDirectorResponse(prompt, maxTokens, retryOnEmpty = true) 
             result?.data?.content,
             result?.data?.text,
         ];
-
         for (const candidate of candidates) {
-            if (typeof candidate === 'string' && candidate.trim()) {
-                return candidate.trim();
-            }
+            if (typeof candidate === 'string' && candidate.trim()) return candidate.trim();
         }
-
         return null;
     };
 
+    // First use SillyTavern's currently connected API. No saved Connection Profile
+    // is needed, and the supplied prompt already includes the story context.
+    // Only use the original profile-based request service on older installations
+    // that do not provide generateRaw.
     const request = async (requestPrompt, requestTokens) => {
-        const result = await connectionService.sendRequest(
-            profileId,
-            requestPrompt,
-            requestTokens,
-            {
-                stream: false,
-                extractData: true,
-            },
-            {
-                reasoning_effort: 'low',
-            }
-        );
-
-        console.log(
-            '[Story Director] RAW API RESULT:',
-            result
-        );
-
-        console.log(
-            '[Story Director] CONTENT CHECK:',
-            typeof result?.content,
-            Boolean(result?.content),
-            result?.content
-        );
-
-        const text = extractResponseText(result);
-
-        if (text) {
-            return text;
+        let result;
+        if (typeof context.generateRaw === 'function') {
+            result = await context.generateRaw({
+                systemPrompt: 'You are Story Director. Return the requested creative planning result in English, without meta commentary.',
+                prompt: requestPrompt,
+                responseLength: requestTokens,
+            });
+        } else if (profileId && typeof connectionService?.sendRequest === 'function') {
+            result = await connectionService.sendRequest(
+                profileId, requestPrompt, requestTokens,
+                { stream: false, extractData: true },
+                { reasoning_effort: 'low' }
+            );
+        } else {
+            throw new Error(
+                'No compatible generation API found. Connect an AI model in SillyTavern, or update SillyTavern to a version that provides generateRaw().'
+            );
         }
-
-        return {
-            empty: true,
-            hasReasoning: Boolean(result?.reasoning),
-            raw: result,
-        };
+        const response = extractResponseText(result);
+        return response || null;
     };
 
     try {
-        const firstAttempt = await request(prompt, maxTokens);
+        const firstAttempt = await request(prompt, responseLength);
+        if (firstAttempt) return firstAttempt;
 
-        if (typeof firstAttempt === 'string') {
-            return firstAttempt;
-        }
-
-        // Some models occasionally return only reasoning instead of a final response;
-        // one concise retry prevents the generation process from failing.
-        //
-        if (retryOnEmpty && firstAttempt?.empty) {
-            console.warn(
-                '[Story Director] Empty response received; trying a shorter retry.'
-            );
-
-            const retryPrompt = `${prompt}\n\n=== IMPORTANT OUTPUT INSTRUCTION ===\nOutput only the finished answer now. No analysis, reasoning, planning, or meta explanation. Start directly with the requested title or result, in English.`;
-
-            const retryTokens = Math.min(Number(maxTokens) || 800, 1000);
+        if (retryOnEmpty) {
+            const retryPrompt = `${prompt}\n\n=== IMPORTANT OUTPUT INSTRUCTION ===\nWrite only the finished result in English. No analysis or reasoning. Start with the requested title.`;
+            const retryTokens = Math.min(responseLength, 1000);
             const secondAttempt = await request(retryPrompt, retryTokens);
-
-            if (typeof secondAttempt === 'string') {
-                return secondAttempt;
-            }
+            if (secondAttempt) return secondAttempt;
         }
 
         throw new Error(
-            '[Story Director] The AI returned no text.'
+            'The connected AI returned no visible text. Try increasing the Director response-token setting, or switching to a model that produces non-empty responses.'
         );
     } catch (error) {
-        console.error(
-            '[Story Director] Generation failed:',
-            error
-        );
-
+        console.error('[Story Director] Generation failed:', error);
         throw error;
     }
 }
@@ -178,7 +133,7 @@ async function generateDirectorResponse(prompt, maxTokens, retryOnEmpty = true) 
 window.testStoryDirectorConnection = async () => {
     try {
         const response = await generateDirectorResponse(
-            'Antworte nur mit: Story Director online.',
+            'Reply only with: Story Director online.',
             100
         );
 
@@ -232,8 +187,18 @@ async function getStoryDirectorBoundLorebookContext() {
         };
     }
 
-    const worldInfo =
-        await context.loadWorldInfo(lorebookName);
+    if (typeof context.loadWorldInfo !== 'function') {
+        console.warn('[Story Director] Lorebook reader is unavailable; continuing without lorebook entries.');
+        return { lorebookName, entries: [] };
+    }
+
+    let worldInfo;
+    try {
+        worldInfo = await context.loadWorldInfo(lorebookName);
+    } catch (error) {
+        console.warn('[Story Director] Could not load the bound lorebook; continuing without it:', error);
+        return { lorebookName, entries: [] };
+    }
 
     const entries = Object.values(
         worldInfo?.entries ?? {}
@@ -328,7 +293,7 @@ function findRelevantStoryDirectorLorebookEntries(
 
         for (const word of uniqueWords) {
 
-            // Exakte bzw. sehr direkte Treffer in Lorebook-Keys
+            // Exact or close matches in lorebook keys
             for (const key of keys) {
                 if (
                     key === word ||
@@ -338,7 +303,7 @@ function findRelevantStoryDirectorLorebookEntries(
                 }
             }
 
-            // Treffer im Namen / Kommentar des Eintrags
+            // Matches in entry names or comments
             if (comment.includes(word)) {
                 score += 8;
             }
@@ -448,7 +413,7 @@ function getStoryDirectorDoomTrackerContext() {
     const context = SillyTavern.getContext();
     const chat = context.chat ?? [];
 
-    // Die letzte Assistant-Nachricht finden
+    // Find the latest assistant reply
     for (let i = chat.length - 1; i >= 0; i--) {
         const message = chat[i];
 
@@ -1507,7 +1472,7 @@ async function generateStoryDirectorEvents(kind = 'event', direction = document.
                 slot: slot.slot,
                 task: slot.task,
                 label: getStoryDirectorTaskLabel(slot.task),
-                response: 'No suggestion could be generated for this slot right now. Other slots were still processed.',
+                response: 'Could not generate this slot: ' + (error?.message || String(error)),
                 failed: true,
             });
         }
@@ -1976,7 +1941,7 @@ Write the continuation in English.
             result.innerHTML = `
                 <div class="story-director-placeholder">
                     <strong>❌ Time Skip Failed</strong>
-                    <p>The owl could not generate the time skip right now.</p>
+                    <p>The owl could not generate the time skip right now.</p>\n                    <small>${escapeStoryDirectorHtml(error?.message || String(error))}</small>
                     <small>Check the browser console for details.</small>
                 </div>
             `;
@@ -1989,6 +1954,13 @@ Write the continuation in English.
             storyDirectorState.eventGenerationInProgress = false;
         }
     });
+}
+
+function escapeStoryDirectorHtml(value) {
+    return String(value ?? '').replace(/[&<>"']/g, char => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;',
+        '"': '&quot;', "'": '&#39;'
+    })[char]);
 }
 
 async function handleDirectorAction(action) {
@@ -2050,7 +2022,7 @@ async function handleDirectorAction(action) {
             result.innerHTML = `
                 <div class="story-director-placeholder">
                     <strong>❌ Generation Failed</strong>
-                    <p>The owl could not generate ${action === 'twist' ? 'twists' : 'events'} right now.</p>
+                    <p>The owl could not generate ${action === 'twist' ? 'twists' : 'events'} right now.</p>\n                    <small>${escapeStoryDirectorHtml(error?.message || String(error))}</small>
                     <small>Check the browser console for details.</small>
                 </div>
             `;
@@ -2110,7 +2082,7 @@ async function handleDirectorAction(action) {
             result.innerHTML = `
                 <div class="story-director-placeholder">
                     <strong>❌ Story Unstuck Failed</strong>
-                    <p>The owl could not find a way forward right now.</p>
+                    <p>The owl could not find a way forward right now.</p>\n                    <small>${escapeStoryDirectorHtml(error?.message || String(error))}</small>
                     <small>Check the browser console for details.</small>
                 </div>
             `;

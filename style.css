@@ -1,0 +1,549 @@
+/* =========================================
+   Story Director – HUD
+   ========================================= */
+
+.story-director-panel {
+    position: fixed;
+    top: 100px;
+    right: 20px;
+
+    width: 320px;
+    max-width: calc(100vw - 40px);
+    max-height: calc(100vh - 90px);
+    overflow-y: auto;
+    z-index: 9999;
+
+    padding: 14px;
+
+    background: var(--SmartThemeBlurTintColor, rgba(30, 30, 30, 0.95));
+    border: 1px solid var(--SmartThemeBorderColor, #555);
+    border-radius: 10px;
+
+    box-shadow: 0 6px 25px rgba(0, 0, 0, 0.45);
+
+    color: var(--SmartThemeBodyColor, #eee);
+
+    box-sizing: border-box;
+
+    user-select: none;
+    touch-action: pan-y;
+}
+
+/* -----------------------------------------
+   Header
+   ----------------------------------------- */
+
+.story-director-header {
+    margin-bottom: 14px;
+
+    cursor: grab;
+}
+
+.story-director-header:active {
+    cursor: grabbing;
+}
+
+.story-director-title {
+    font-size: 1.25em;
+    font-weight: bold;
+}
+
+.story-director-subtitle {
+    margin-top: 3px;
+
+    font-size: 0.8em;
+    opacity: 0.65;
+}
+
+/* -----------------------------------------
+   Buttons
+   ----------------------------------------- */
+
+.story-director-section {
+    margin-bottom: 12px;
+}
+
+.story-director-section-title {
+    margin-bottom: 8px;
+
+    font-size: 0.9em;
+    font-weight: bold;
+
+    opacity: 0.8;
+}
+
+.story-director-button {
+    display: block;
+
+    width: 100%;
+
+    margin: 6px 0;
+    padding: 10px;
+
+    border: 1px solid var(--SmartThemeBorderColor, #555);
+    border-radius: 7px;
+
+    background: rgba(255, 255, 255, 0.06);
+    color: var(--SmartThemeBodyColor, #eee);
+
+    cursor: pointer;
+
+    font-size: 0.95em;
+
+    transition:
+        background 0.15s ease,
+        transform 0.1s ease;
+}
+
+.story-director-button:hover {
+    background: rgba(255, 255, 255, 0.12);
+}
+
+.story-director-button:active {
+    transform: scale(0.98);
+}
+
+/* -----------------------------------------
+   Result
+   ----------------------------------------- */
+
+.story-director-result {
+    margin-top: 12px;
+    padding-top: 12px;
+
+    border-top: 1px solid var(--SmartThemeBorderColor, #555);
+}
+
+.story-director-empty {
+    text-align: center;
+
+    font-size: 0.85em;
+
+    opacity: 0.65;
+
+    line-height: 1.5;
+}
+
+.story-director-empty span {
+    font-size: 0.9em;
+}
+
+.story-director-placeholder {
+    padding: 10px;
+
+    border-radius: 6px;
+
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.story-director-placeholder p {
+    margin: 8px 0;
+}
+
+.story-director-placeholder small {
+    opacity: 0.6;
+}
+
+.story-director-result-card {
+    margin-bottom: 10px;
+    padding: 10px;
+
+    border: 1px solid var(--SmartThemeBorderColor, #555);
+    border-radius: 8px;
+
+    background: rgba(255, 255, 255, 0.04);
+
+    box-sizing: border-box;
+}
+
+.story-director-result-card strong {
+    display: block;
+
+    margin-bottom: 8px;
+
+    font-size: 0.9em;
+}
+
+.story-director-result-text {
+    max-height: 220px;
+
+    overflow-y: auto;
+
+    padding-right: 4px;
+
+    font-size: 0.88em;
+    line-height: 1.45;
+
+    white-space: pre-wrap;
+
+    user-select: text;
+    touch-action: pan-y;
+}
+
+/* -----------------------------------------
+   Mobile
+   ----------------------------------------- */
+
+@media (max-width: 600px) {
+
+    .story-director-panel {
+        width: 280px;
+        max-width: calc(100vw - 24px);
+
+        top: 70px;
+        right: 12px;
+
+        padding: 12px;
+
+        border-radius: 9px;
+    }
+
+    .story-director-title {
+        font-size: 1.1em;
+    }
+
+    .story-director-button {
+        min-height: 44px;
+
+        padding: 10px;
+
+        font-size: 0.95em;
+    }
+}
+/* =========================================
+   Story Director – HUD Toggle
+   ========================================= */
+
+.story-director-toggle {
+    position: fixed;
+
+    left: auto;
+    top: 100px;
+    right: 20px;
+
+    width: 52px;
+    height: 52px;
+    max-height: calc(100vh - 90px);
+    overflow-y: auto;
+    z-index: 10000;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 0;
+
+    border: 1px solid var(--SmartThemeBorderColor, #555);
+    border-radius: 50%;
+
+    background: var(--SmartThemeBlurTintColor, rgba(30, 30, 30, 0.95));
+    color: var(--SmartThemeBodyColor, #eee);
+
+    box-shadow: 0 5px 18px rgba(0, 0, 0, 0.45);
+
+    font-size: 28px;
+    line-height: 1;
+
+    cursor: grab;
+
+    user-select: none;
+    touch-action: pan-y;
+
+    transition:
+        transform 0.15s ease,
+        background 0.15s ease;
+}
+
+.story-director-toggle:hover {
+    transform: scale(1.06);
+}
+
+.story-director-toggle:active {
+    cursor: grabbing;
+    transform: scale(0.96);
+}
+
+.story-director-toggle.story-director-hidden {
+    display: none;
+}
+
+
+/* =========================================
+   Story Director – Panel states
+   ========================================= */
+
+.story-director-panel.story-director-collapsed {
+    display: none;
+}
+
+
+/* =========================================
+   Close button
+   ========================================= */
+
+.story-director-close {
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    width: 32px;
+    height: 32px;
+
+    padding: 0;
+
+    border: 0;
+    border-radius: 50%;
+
+    background: transparent;
+    color: var(--SmartThemeBodyColor, #eee);
+
+    font-size: 24px;
+    line-height: 1;
+
+    cursor: pointer;
+
+    opacity: 0.7;
+}
+
+.story-director-close:hover {
+    background: rgba(255, 255, 255, 0.1);
+    opacity: 1;
+}
+
+
+/* =========================================
+   Mobile HUD
+   ========================================= */
+
+@media (max-width: 600px) {
+
+    .story-director-toggle {
+        width: 56px;
+        height: 56px;
+
+        font-size: 30px;
+
+        right: 12px;
+        top: 70px;
+    }
+
+    .story-director-close {
+        width: 40px;
+        height: 40px;
+
+        font-size: 28px;
+    }
+}
+
+.story-director-settings {
+    display: none;
+}
+
+.story-director-settings-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 14px;
+}
+
+.story-director-settings-header strong {
+    font-size: 16px;
+}
+
+.story-director-back {
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    border: 1px solid var(--SmartThemeBorderColor, #555);
+    border-radius: 8px;
+    background: var(--SmartThemeBlurTintColor, rgba(30, 30, 30, 0.95));
+    color: var(--SmartThemeBodyColor, #eee);
+    font-size: 20px;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.story-director-back:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.story-director-settings-content {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.story-director-setting-label {
+    display: block;
+    margin-bottom: 5px;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.story-director-select {
+    width: 100%;
+    min-height: 40px;
+    padding: 8px 10px;
+    border: 1px solid var(--SmartThemeBorderColor, #555);
+    border-radius: 8px;
+    background: var(--SmartThemeBlurTintColor, rgba(30, 30, 30, 0.95));
+    color: var(--SmartThemeBodyColor, #eee);
+    font-size: 14px;
+}
+
+.story-director-slots {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 4px;
+}
+
+.story-director-slot {
+    padding: 10px;
+    border: 1px solid var(--SmartThemeBorderColor, #555);
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.03);
+}
+
+.story-director-slot .story-director-setting-label {
+    margin-bottom: 6px;
+}
+
+.story-director-options {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 8px;
+    padding-top: 10px;
+    border-top: 1px solid var(--SmartThemeBorderColor, #555);
+}
+
+.story-director-checkbox {
+    display: flex;
+    align-items: flex-start;
+    gap: 9px;
+    padding: 7px 4px;
+    font-size: 13px;
+    line-height: 1.35;
+    cursor: pointer;
+}
+
+.story-director-checkbox input {
+    flex: 0 0 auto;
+    width: 17px;
+    height: 17px;
+    margin: 0;
+    cursor: pointer;
+    accent-color: var(--SmartThemeQuoteColor, #888);
+}
+
+.story-director-checkbox span {
+    flex: 1;
+}
+
+.story-director-generation {
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid var(--SmartThemeBorderColor, #555);
+}
+
+.story-director-generation-title {
+    margin-bottom: 8px;
+    font-size: 15px;
+    font-weight: 700;
+}
+
+.story-director-token-settings {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 8px;
+}
+
+.story-director-token-setting {
+    padding: 9px;
+    border: 1px solid var(--SmartThemeBorderColor, #555);
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.03);
+}
+
+.story-director-token-setting .story-director-setting-label {
+    margin-bottom: 6px;
+}
+/* =========================================
+   Story Director – Vorschlags-Aktionen
+   ========================================= */
+
+.story-director-card-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 10px;
+}
+
+.story-director-card-button {
+    flex: 1;
+    min-height: 38px;
+    padding: 7px 9px;
+    border: 1px solid var(--SmartThemeBorderColor, #555);
+    border-radius: 7px;
+    background: rgba(255, 255, 255, 0.06);
+    color: var(--SmartThemeBodyColor, #eee);
+    cursor: pointer;
+    font-size: 0.85em;
+    transition: background 0.15s ease, transform 0.1s ease;
+}
+
+.story-director-card-button:hover {
+    background: rgba(255, 255, 255, 0.12);
+}
+
+.story-director-card-button:active {
+    transform: scale(0.98);
+}
+
+.story-director-card-button:disabled {
+    opacity: 0.55;
+    cursor: wait;
+}
+
+.story-director-result-editor {
+    display: block;
+    width: 100%;
+    min-height: 150px;
+    margin-top: 8px;
+    padding: 9px;
+    border: 1px solid var(--SmartThemeBorderColor, #555);
+    border-radius: 7px;
+    background: rgba(0, 0, 0, 0.2);
+    color: var(--SmartThemeBodyColor, #eee);
+    box-sizing: border-box;
+    resize: vertical;
+    font: inherit;
+    line-height: 1.45;
+}
+
+@media (max-width: 600px) {
+    .story-director-card-actions {
+        flex-direction: column;
+    }
+
+    .story-director-card-button {
+        min-height: 44px;
+    }
+}
+
+.story-director-direction {
+    width: 100%;
+    box-sizing: border-box;
+    min-height: 60px;
+    padding: 8px;
+    margin: 6px 0 10px;
+    resize: vertical;
+    font: inherit;
+    color: var(--SmartThemeBodyColor, #eee);
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid var(--SmartThemeBorderColor, #555);
+    border-radius: 7px;
+}

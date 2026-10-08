@@ -1,0 +1,14 @@
+{
+    "display_name": "Story Director (English)",
+    "loading_order": 100,
+    "requires": [],
+    "optional": [],
+    "js": "index.js",
+    "css": "style.css",
+    "author": "noirbunny-max",
+    "version": "0.1.0",
+    "homePage": "https://github.com/Bfuertes38/SQL/tree/storydirector-english",
+    "hooks": {
+        "activate": "init"
+    }
+}

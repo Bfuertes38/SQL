@@ -2025,7 +2025,7 @@ async function handleDirectorAction(action) {
 
         result.innerHTML = `
             <div class="story-director-placeholder">
-                <strong>${name}s are being generated...</strong>
+                <strong>Generating ${name} suggestions...</strong>
                 <p>🦉 The owl is thinking...</p>
             </div>
         `;
@@ -2050,7 +2050,7 @@ async function handleDirectorAction(action) {
             result.innerHTML = `
                 <div class="story-director-placeholder">
                     <strong>❌ Generation Failed</strong>
-                    <p>The owl could not generate any ${action === 'twist' ? 'Twists' : 'Events'} them.</p>
+                    <p>The owl could not generate ${action === 'twist' ? 'twists' : 'events'} right now.</p>
                     <small>Check the browser console for details.</small>
                 </div>
             `;
